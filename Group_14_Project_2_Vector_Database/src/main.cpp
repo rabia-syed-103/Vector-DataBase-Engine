@@ -1,61 +1,29 @@
 #include <iostream>
+#include <string>
 #include "VectorStore.h"
-#include "SearchResult.h"
+#include "server.h"
 
 using namespace std;
 
-int main() {
+int main(int argc, char* argv[]) {
+    int dim         = 128;
+    int port        = 5556;
+    string data_dir = "./vdata";
+
+    for (int i = 1; i < argc; i++) {
+        if (string(argv[i]) == "--dim"  && i + 1 < argc) dim      = stoi(argv[++i]);
+        if (string(argv[i]) == "--port" && i + 1 < argc) port     = stoi(argv[++i]);
+        if (string(argv[i]) == "--data" && i + 1 < argc) data_dir = argv[++i];
+    }
+
     VectorStore store;
+    store_init(store, dim);
 
-    // 1. Initialize store
-    store_init(store, 4);
+    cout << "vdb started on port " << port
+         << ", dimension " << dim
+         << ", data directory " << data_dir << "\n";
+    cout.flush();
 
-    cout << "=== ADDING VECTORS ===" << endl;
-
-    // 2. Add vectors
-    store_add(store, 1, {0.1, 0.2, 0.3, 0.4});
-    store_add(store, 2, {0.5, 0.6, 0.7, 0.8});
-    store_add(store, 3, {0.9, 0.1, 0.2, 0.3});
-
-    cout << "Count after adds: " << store.count << endl;
-
-    // 3. Overwrite test (same ID)
-    cout << "\n=== OVERWRITE TEST ===" << endl;
-    store_add(store, 2, {1.0, 1.0, 1.0, 1.0}); // overwrite ID 2
-
-    cout << "Vector for ID 2 overwritten.\n";
-
-    // 4. Search test
-    cout << "\n=== BRUTE SEARCH ===" << endl;
-
-    vector<float> query = {1.2, 1.2, 1.2, 1.2};
-    int scanned = 0;
-
-    vector<SearchResult> results = brute_search(store, query, 2, scanned);
-
-    cout << "Scanned vectors: " << scanned << endl;
-
-    // 5. Print results
-    for (auto &r : results) {
-        cout << "ID: " << r.id
-             << " | Dist: " << r.dist
-             << " | Vec: ";
-
-        for (float v : r.vec)
-            cout << v << " ";
-
-        cout << endl;
-    }
-
-    // 6. Validation checks
-    cout << "\n=== VALIDATION ===" << endl;
-
-    cout << "Expected dim: 4, actual: " << store.dim << endl;
-    cout << "Total vectors: " << store.count << endl;
-
-    if (store.id_to_index.find(2) != store.id_to_index.end()) {
-        cout << "Overwrite check passed for ID 2" << endl;
-    }
-
+    start_server(port, store);
     return 0;
 }
