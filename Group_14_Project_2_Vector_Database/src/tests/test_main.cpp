@@ -3,10 +3,19 @@
 #include <string>
 #include "VectorStore.h"
 #include "protocol.h"
-
+#include "SearchResult.h"
 using namespace std;
 
 int main() {
+    cout << "\n===distance_sq basic ===" << endl;
+    {
+        float a[] = {0.0f, 0.0f};
+        float b[] = {3.0f, 4.0f};
+        float result = distance_sq(a, b, 2);
+        cout << "distance_sq([0,0], [3,4]) = " << result << " (expected 25)" << endl;
+        assert(result == 25.0f);
+        cout << "Passed." << endl;
+    }
     VectorStore store;
     store_init(store, 4);
 
