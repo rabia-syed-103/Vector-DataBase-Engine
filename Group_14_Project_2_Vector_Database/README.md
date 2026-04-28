@@ -37,7 +37,7 @@ if you pull the repositories and `vdb`,`vdb-cli` are already there it might not 
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--dim` | `4` | Dimension of all stored vectors |
+| `--dim` | `128` | Dimension of all stored vectors |
 | `--port` | `5556` | TCP port to listen on |
 | `--data` | `./vdata` | Directory for snapshot files (Phase 3) |
 
