@@ -73,6 +73,7 @@ static string handle_STATS(VectorStore& store) {
     out << "dimension: "     << store.dim   << "\n";
     out << "total vectors: " << store.count << "\n";
     out << "index built: "   << (store.index_built ? "yes" : "no") << "\n";
+    out << "\n";  
     // Phase 2 adds cluster count and per-cluster sizes here
     return out.str();
 }
