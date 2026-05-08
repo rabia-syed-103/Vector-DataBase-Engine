@@ -9,9 +9,9 @@ float distance_sq(const float* a, const float* b, int D) {
     return sum;
 }
 
-std::vector<SearchResult> brute_search(VectorStore& store,const vector<float>& query,int k,
+vector<SearchResult> brute_search(VectorStore& store,const vector<float>& query,int k,
                                         int& scanned_out) {
-    std::lock_guard<std::mutex> lock(store.mtx);
+    lock_guard<std::mutex> lock(store.mtx);
 
     using Pair = std::pair<float, int>; 
     std::priority_queue<Pair> heap;

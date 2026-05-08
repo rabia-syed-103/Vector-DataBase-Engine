@@ -12,6 +12,6 @@ struct SearchResult {
 
 float distance_sq(const float* a, const float* b, int D);
 
-vector<SearchResult> brute_search(VectorStore& store,const std::vector<float>& query,int k,int& scanned_out);
+vector<SearchResult> brute_search(VectorStore& store,const vector<float>& query,int k,int& scanned_out);
 
 #endif
