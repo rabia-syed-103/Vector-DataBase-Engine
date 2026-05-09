@@ -50,11 +50,12 @@ int main(int argc, char* argv[]) {
             cout.flush();
             string resp(line);
             if (!resp.empty() && resp.back() == '\n') resp.pop_back();
-            if (resp.empty()          ||   
-                resp == "OK"          ||
-                resp == "BYE"         ||
-                (!resp.empty() && resp.front() == '(') ||
-                (resp.size() >= 5 && resp.substr(0, 5) == "ERROR")) break;
+
+            if (resp.empty()                                       ||
+                resp == "OK"                                       ||
+                resp == "BYE"                                      ||
+                (!resp.empty() && resp.front() == '(')             ||
+                (resp.size() >= 5 && resp.substr(0,5) == "ERROR")) break;
         }
 
         if (sent == "QUIT") break;
