@@ -1,4 +1,4 @@
-echo "=== Phase 2 Test ==="
+echo "===Phase 2 Test==="
 
 ./vdb --data ./vdata --dim 4 --port 5556 &
 PID=$!
