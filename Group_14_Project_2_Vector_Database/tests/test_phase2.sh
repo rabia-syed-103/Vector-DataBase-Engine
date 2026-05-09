@@ -1,8 +1,5 @@
-#!/bin/bash
-
 echo "=== Phase 2 Test ==="
 
-# start server in background
 ./vdb --data ./vdata --dim 4 --port 5556 &
 PID=$!
 sleep 1
@@ -48,4 +45,4 @@ echo "--- QUIT ---"
 send "QUIT"
 
 kill $PID
-echo "=== Test Done ==="
+
