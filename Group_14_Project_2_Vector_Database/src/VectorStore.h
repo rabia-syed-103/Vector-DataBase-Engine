@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <mutex>
 #include <cstdint>
+#include "IVFIndex.h"
+
 using namespace std;
 struct VectorStore {
     vector<float> vectors;      
@@ -13,6 +15,7 @@ struct VectorStore {
     int dim = 0;
     int count = 0;
     bool index_built = false; 
+    IVFIndex index;
 };
 
 void store_init(VectorStore& store, int dim);

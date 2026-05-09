@@ -22,8 +22,10 @@ void store_add(VectorStore& store, int64_t id, const vector<float>& vec) {
         store.id_to_index[id] = store.count;
         store.count++;
     }
-    if (store.index_built) {
-        // TODO: update index if needed
-        // This will be done in in Phase 2
+    if (store.index_built) 
+    {
+        int internal = store.id_to_index[id];
+        int c = nearest_centroid(store.index, store.vectors.data() + internal * store.dim);
+        store.index.cluster_lists[c].push_back(internal);
     }
 }
