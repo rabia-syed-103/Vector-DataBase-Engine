@@ -20,7 +20,13 @@ static vector<string> tokenize(const string& line) {
 static string handle_ADD(const vector<string>& tokens, VectorStore& store) {
     if ((int)tokens.size() != 2 + store.dim)
         return "ERROR wrong number of components\n";
-    int64_t id = stoll(tokens[1]);
+
+    int64_t id;
+    try {
+        id = std::stoll(tokens[1]);
+    } catch (...) {
+        return "ERROR invalid id, must be a 64-bit integer\n";
+    }
     vector<float> vec;
     for (int i = 0; i < store.dim; i++)
         vec.push_back(stof(tokens[2 + i]));
@@ -32,11 +38,20 @@ static string handle_SEARCH(const vector<string>& tokens, VectorStore& store) {
     if ((int)tokens.size() < store.dim + 3)
         return "ERROR too few arguments for SEARCH\n";
 
-    vector<float> query;
-    for (int i = 0; i < store.dim; i++)
-        query.push_back(stof(tokens[1 + i]));
+    std::vector<float> query;
+    try {
+        for (int i = 0; i < store.dim; i++)
+            query.push_back(std::stof(tokens[1 + i]));
+    } catch (...) {
+        return "ERROR invalid float in query vector\n";
+    }
 
-    int k       = stoi(tokens[1 + store.dim]);
+    int k;
+    try {
+        k = stoi(tokens[1 + store.dim]);
+    } catch (...) {
+        return "ERROR invalid k value\n";
+    }
     string mode = tokens[2 + store.dim];
 
     if (mode == "BRUTE") {
@@ -121,7 +136,7 @@ static string handle_STATS(VectorStore& store) {
         out << "\n";
     }
 
-    out << "OK\n";
+    out << "\n";
     return out.str();
 }
 
