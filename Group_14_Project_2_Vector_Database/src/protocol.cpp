@@ -6,6 +6,7 @@
 #include <string>
 #include <cstdint>
 #include <chrono>
+#include "persistence.h"
 
 using namespace std;
 
@@ -140,6 +141,20 @@ static string handle_STATS(VectorStore& store) {
     return out.str();
 }
 
+static string handle_SAVE(VectorStore& store,const string& data_dir) {
+    std::lock_guard<std::mutex> lock(store.mtx);
+    bool ok = store_save(store, data_dir);
+    if (ok) return "OK\n";
+    return "ERROR save failed\n";
+}
+
+static string handle_LOAD(VectorStore& store,const string& data_dir) {
+    std::lock_guard<std::mutex> lock(store.mtx);
+    bool ok = store_load(store, data_dir);
+    if (ok) return "OK\n";
+    return "ERROR load failed or no snapshot found\n";
+}
+
 string parse_and_dispatch(const string& line, VectorStore& store) {
     auto tokens = tokenize(line);
     if (tokens.empty()) return "";
@@ -151,8 +166,9 @@ string parse_and_dispatch(const string& line, VectorStore& store) {
     if (cmd == "STATS")  return handle_STATS(store);
     if (cmd == "QUIT")   return "QUIT";
     if (cmd == "BUILD")  return handle_BUILD(store);
-    if (cmd == "SAVE")   return "ERROR not implemented yet\n";
-    if (cmd == "LOAD")   return "ERROR not implemented yet\n";
+    if (cmd == "SAVE") return handle_SAVE(store, data_dir);
+    if (cmd == "LOAD") return handle_LOAD(store, data_dir);
 
     return "ERROR unknown command\n";
 }
+
