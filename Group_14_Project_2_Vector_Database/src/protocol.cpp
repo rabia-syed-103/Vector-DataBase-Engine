@@ -155,7 +155,7 @@ static string handle_LOAD(VectorStore& store,const string& data_dir) {
     return "ERROR load failed or no snapshot found\n";
 }
 
-string parse_and_dispatch(const string& line, VectorStore& store) {
+string parse_and_dispatch(const string& line, VectorStore& store,const string& data_dir) {
     auto tokens = tokenize(line);
     if (tokens.empty()) return "";
 

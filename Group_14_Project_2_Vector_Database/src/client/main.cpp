@@ -1,47 +1,94 @@
-#include "server.h"
-#include "VectorStore.h"
-#include "persistence.h"
-
+#include <iostream>
+#include <string>
+#include <cstdio>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <netdb.h>        // ← ADD for gethostbyname
+#include <unistd.h>
 using namespace std;
 
 int main(int argc, char* argv[]) {
-    int port = 5556;
-    int dim = 128;
-    string data_dir = "./vdata";
+    if (argc < 3) {
+        cerr << "Usage: vdb-cli <host> <port>\n";
+        return 1;
+    }
 
-    for (int i = 1; i < argc; i++) {
-        string arg = argv[i];
+    const char* host = argv[1];
+    int port = stoi(argv[2]);
 
-        if (arg == "--port" && i + 1 < argc) {
-            port = stoi(argv[++i]);
+    // create socket
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) {
+        cerr << "ERROR: cannot create socket\n";
+        return 1;
+    }
+
+    // resolve hostname → works for both "localhost" and "127.0.0.1"
+    struct hostent* he = gethostbyname(host);
+    if (!he) {
+        cerr << "ERROR: cannot resolve host " << host << "\n";
+        return 1;
+    }
+
+    // connect
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_port   = htons(port);
+    addr.sin_addr   = *(struct in_addr*)he->h_addr;
+
+    if (connect(sock, (sockaddr*)&addr, sizeof(addr)) < 0) {
+        cerr << "ERROR: cannot connect to "
+             << host << ":" << port << "\n";
+        return 1;
+    }
+
+    cout << "connected to vdb at " << host << ":" << port << "\n";
+
+    FILE* f = fdopen(sock, "r+");
+    if (!f) {
+        cerr << "ERROR: fdopen failed\n";
+        return 1;
+    }
+
+    char line[65536];
+
+    while (true) {
+        cout << "> ";
+        cout.flush();
+
+        if (!fgets(line, sizeof(line), stdin)) break;
+
+        fputs(line, f);
+        fflush(f);
+
+        string sent(line);
+        if (!sent.empty() && sent.back() == '\n')
+            sent.pop_back();
+
+        if (sent == "QUIT") {
+            if (fgets(line, sizeof(line), f))
+                cout << line;
+            break;
         }
-        else if (arg == "--dim" && i + 1 < argc) {
-            dim = stoi(argv[++i]);
-        }
-        else if (arg == "--data" && i + 1 < argc) {
-            data_dir = argv[++i];
+
+        while (fgets(line, sizeof(line), f)) {
+            string resp(line);
+            if (!resp.empty() && resp.back() == '\n')
+                resp.pop_back();
+
+            cout << resp << "\n";
+            cout.flush();
+
+            if (resp.empty()                      ||
+                resp == "OK"                      ||
+                resp == "BYE"                     ||
+                (!resp.empty() && resp[0] == '(') ||
+                (resp.size() >= 5 &&
+                 resp.substr(0, 5) == "ERROR")) break;
         }
     }
 
-    string mkdir_cmd = "mkdir -p " + data_dir;
-    system(mkdir_cmd.c_str());
-
-    VectorStore store(dim);
-
-    if (loadSnapshot(store, data_dir)) {
-        cout << "auto-loaded snapshot from "
-             << data_dir << endl;
-    }
-
-    cout << "vdb started on port "
-         << port
-         << ", dimension "
-         << store.dimension
-         << ", data directory "
-         << data_dir
-         << endl;
-
-    startServer(port, store, data_dir);
-
+    fclose(f);
     return 0;
 }

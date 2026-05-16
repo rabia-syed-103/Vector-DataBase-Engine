@@ -10,10 +10,9 @@
 
 using namespace std;
 
-static void handle_client(int client_fd, VectorStore& store) {
+static void handle_client(int client_fd, VectorStore& store,string data_dir) {
     FILE* f = fdopen(client_fd, "r+");
     if (!f) { close(client_fd); return; }
-
     char line[65536];
 
     while (fgets(line, sizeof(line), f)) {
@@ -22,7 +21,7 @@ static void handle_client(int client_fd, VectorStore& store) {
         if (!cmd.empty() && cmd.back() == '\r') cmd.pop_back();
         if (cmd.empty()) continue;
 
-        string response = parse_and_dispatch(cmd, store);
+        string response = parse_and_dispatch(cmd, store,data_dir);
 
         if (response == "QUIT") {
             fputs("BYE\n", f);
@@ -37,7 +36,7 @@ static void handle_client(int client_fd, VectorStore& store) {
     fclose(f);
 }
 
-void start_server(int port, VectorStore& store) {
+void start_server(int port, VectorStore& store,string& data_dir) {
     int server_fd = socket(AF_INET, SOCK_STREAM, 0);
 
     int opt = 1;
@@ -57,6 +56,6 @@ void start_server(int port, VectorStore& store) {
     while (true) {
         int client_fd = accept(server_fd, nullptr, nullptr);
         if (client_fd < 0) continue;
-        thread(handle_client, client_fd, ref(store)).detach();
+       thread(handle_client, client_fd,ref(store), data_dir).detach();
     }
 }

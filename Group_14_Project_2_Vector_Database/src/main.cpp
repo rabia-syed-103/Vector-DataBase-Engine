@@ -1,29 +1,33 @@
-#include <iostream>
-#include <string>
+#include "persistence.h"
 #include "VectorStore.h"
-#include "server.h"
-
-using namespace std;
+#include "server.h"        // ← ADD THIS
+#include <iostream>        // ← ADD THIS
+#include <string>
 
 int main(int argc, char* argv[]) {
-    int dim         = 128;
-    int port        = 5556;
-    string data_dir = "./vdata";
+    int         port     = 5556;
+    int         dim      = 128;
+    std::string data_dir = "./vdata";
 
     for (int i = 1; i < argc; i++) {
-        if (string(argv[i]) == "--dim"  && i + 1 < argc) dim      = stoi(argv[++i]);
-        if (string(argv[i]) == "--port" && i + 1 < argc) port     = stoi(argv[++i]);
-        if (string(argv[i]) == "--data" && i + 1 < argc) data_dir = argv[++i];
+        if (std::string(argv[i]) == "--port") port     = std::stoi(argv[++i]);
+        if (std::string(argv[i]) == "--dim")  dim      = std::stoi(argv[++i]);
+        if (std::string(argv[i]) == "--data") data_dir = argv[++i];
     }
+
+    std::string mkdir_cmd = "mkdir -p " + data_dir;
+    system(mkdir_cmd.c_str());
 
     VectorStore store;
     store_init(store, dim);
 
-    cout << "vdb started on port " << port
-         << ", dimension " << dim
-         << ", data directory " << data_dir << "\n";
-    cout.flush();
+    if (store_load(store, data_dir))
+        std::cout << "auto-loaded snapshot from " << data_dir << "\n";
 
-    start_server(port, store);
+    std::cout << "vdb started on port " << port
+              << ", dimension "         << dim
+              << ", data directory "    << data_dir << "\n";
+
+    start_server(port, store, data_dir);
     return 0;
 }

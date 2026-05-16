@@ -4,7 +4,7 @@
 #include "VectorStore.h"
 #include <string>
 using namespace std;
-string parse_and_dispatch(const std::string& line, VectorStore& store);
+string parse_and_dispatch(const string& line, VectorStore& store,const string& data_dir);
  
 #endif
  

@@ -5,6 +5,6 @@
 
 using namespace std;
 
-void start_server(int port, VectorStore& store);
+void start_server(int port, VectorStore& store,string& data_dir);
 
 #endif
