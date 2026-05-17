@@ -12,16 +12,16 @@ Inserting 50000 vectors (D=64)...
   30000 / 50000 inserted...
   40000 / 50000 inserted...
   50000 / 50000 inserted...
-Insert complete: 6.23689 s  (8016 inserts/sec)
+Insert complete: 8.00739 s  (6244 inserts/sec)
 
 Running BUILD...
 Building IVF index...
 vectors: 50000
 clusters: 223
 iterations: 50
-done in 139.323 s.
+done in 132.417 s.
 OK
-Build wall time: 139.323 s
+Build wall time: 132.418 s
 
 Running 100 queries...
 
@@ -38,9 +38,22 @@ Parameters: N=50000, D=64, K=10, queries=100, seed=42
 
 Mode     nprobe   Avg time (ms)    Recall@10    Speedup   
 ----     ------   -------------    ---------    -------   
-BRUTE    -        65.145           1.000        1.0x      
-IVF      1        42.262           0.067        1.5       x
-IVF      5        43.302           0.218        1.5       x
-IVF      10       44.420           0.317        1.5       x
-IVF      25       47.407           0.539        1.4       x
+BRUTE    -        62.927           1.000        1.0x      
+IVF      1        42.345           0.067        1.5       x
+IVF
+========================================
+   Benchmark Results
+========================================
+Parameters: N=50000, D=64, K=10, queries=100, seed=42
 
+Mode     nprobe   Avg time (ms)    Recall@10    Speedup   
+----     ------   -------------    ---------    -------   
+BRUTE    -        62.927           1.000        1.0x      
+IVF      1        42.345           0.067        1.5       x
+IVF      5        43.332           0.218        1.5       x
+IVF      10       44.453           0.317        1.4       x
+IVF      25       47.305           0.539        1.3       x
+
+
+Stopping server...
+Done. Results saved to benchmark/results.txt
